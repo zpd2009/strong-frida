@@ -1,5 +1,9 @@
 # strong-frida Change Log
 
+## version 1.5
+
+- add support for frida v14.2.9 build.
+
 ## version 1.4
 
 - add support for frida v14 build.

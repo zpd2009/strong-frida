@@ -18,10 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
 
-      - name: Set up Python 3.7
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Create RELEASE.md
         run: python releasenote.py
@@ -110,14 +110,20 @@ jobs:
       with:
         java-version: 1.8
 
-    - name: Set up Python 3.7
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: 3.8
+
+    - name: Set up Android NDK r22
+      id: setup-ndk
+      uses: nttld/setup-ndk@v1.0.3
+      with:
+        ndk-version: r22
 
     - name: install dependencies
       run: |
-        sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install tree ninja-build gcc-multilib g++-multilib lib32stdc++-5-dev flex bison xz-utils ruby ruby-dev python3-requests python3-setuptools python3-dev libc6-dev libc6-dev-i386 -y
+        sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install build-essential tree ninja-build gcc-multilib g++-multilib lib32stdc++-5-dev flex bison xz-utils ruby ruby-dev python3-requests python3-setuptools python3-dev libc6-dev libc6-dev-i386 -y
         sudo gem install fpm -v 1.11.0 --no-document
         python3 -m pip install lief
 
@@ -126,7 +132,7 @@ jobs:
       run: |
         git config --global user.name '${{ needs.release.outputs.user_name }}'
         git config --global user.email '${{ needs.release.outputs.user_email }}'
-        export ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk-bundle
+        export ANDROID_NDK_ROOT=${{ steps.setup-ndk.outputs.ndk-path }}
         git clone --recurse-submodules https://github.com/frida/frida
         cd frida/frida-core
         git am ../../patch/frida-core/*.patch
@@ -466,14 +472,14 @@ jobs:
       with:
         java-version: 1.8
 
-    - name: Set up Python 3.7
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: 3.8
 
     - name: install dependencies
       run: |
-        sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install tree ninja-build gcc-multilib g++-multilib lib32stdc++-5-dev flex bison xz-utils ruby ruby-dev python3-requests python3-setuptools python3-dev libc6-dev libc6-dev-i386 -y
+        sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install build-essential tree ninja-build gcc-multilib g++-multilib lib32stdc++-5-dev flex bison xz-utils ruby ruby-dev python3-requests python3-setuptools python3-dev libc6-dev libc6-dev-i386 -y
         sudo gem install fpm -v 1.11.0 --no-document
         python3 -m pip install lief
 
@@ -651,86 +657,97 @@ jobs:
         asset_name: 'frida-gumjs-devkit-${{ needs.release.outputs.frida_version }}-linux-x86_64.tar.xz'
         asset_content_type: application/octet-stream
 
-  macos_build:
-    runs-on: macOS-10.15
-    needs: release
+  check_cert:
+    runs-on: macos-10.15
+
+    outputs:
+      CERT_OK: ${{ steps.check.outputs.CERT_OK }}
 
     steps:
-    - uses: actions/checkout@v2.3.4
+      - name: Check cert file
+        id: check
+        shell: bash
+        env:
+          CERTIFICATES_P12: ${{ secrets.CERTIFICATES_P12 }}
+          CERTIFICATES_P12_PASSWORD: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+          CERTIFICATE_NAME: ${{ secrets.CERTIFICATE_NAME }}
+        run: |
+          echo "::set-output name=CERT_OK::1"
+          [[ -z "$CERTIFICATES_P12" ]] && echo "::set-output name=CERT_OK::0"
+          [[ -z "$CERTIFICATES_P12_PASSWORD" ]] && echo "::set-output name=CERT_OK::0"
+          [[ -z "$CERTIFICATE_NAME" ]] && echo "::set-output name=CERT_OK::0"
 
-    - uses: actions/setup-node@v2.1.4
-      with:
-        node-version: '12'
+  macos_build:
+    runs-on: macOS-10.15
+    needs: [release]
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+    steps:
+      - uses: actions/checkout@v2.3.4
 
-    - name: Set up sign cert
-      run: |
-        security create-keychain -p password Frida.keychain
-        security set-keychain-settings -lut 21600 Frida.keychain
-        security unlock-keychain -p password Frida.keychain
-        sudo security add-trusted-cert -k Frida.keychain -p codeSign -r trustRoot ./frida.cer
-        # security set-key-partition-list -S apple-tool:,apple: -k password ~/Library/Keychains/Frida.keychain-db
-        sudo killall taskgated
-        security list-keychains -d user -s Frida.keychain login.keychain
-        security dump-keychain Frida.keychain
-        security find-certificate -p -c frida-cert | openssl x509 -checkend 0
-        security find-identity -p codesigning
-        # security delete-keychain Frida.keychain
+      - uses: actions/setup-node@v2.1.4
+        with:
+          node-version: '12'
 
-    - name: build frida for macOS
-      run: |
-        git config --global user.name '${{ needs.release.outputs.user_name }}'
-        git config --global user.email '${{ needs.release.outputs.user_email }}'
-        git clone --recurse-submodules https://github.com/frida/frida
-        cd frida
-        export MACOS_CERTID=frida-cert
-        export IOS_CERTID=frida-cert
-        make core-macos
-        make gum-macos
-        make gumjs-macos
-        make core-ios
-        make gum-ios
-        make gumjs-ios
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+
+      - name: build frida for macOS
+        run: |
+          git config --global user.name '${{ needs.release.outputs.user_name }}'
+          git config --global user.email '${{ needs.release.outputs.user_email }}'
+          git clone --recurse-submodules https://github.com/frida/frida
+          cd frida
+          export MACOS_CERTID='${{ secrets.CERTIFICATE_NAME }}'
+          export IOS_CERTID='${{ secrets.CERTIFICATE_NAME }}'
+          make core-macos
+          make gum-macos
+          make gumjs-macos
+          make core-ios
+          make gum-ios
+          make gumjs-ios
 
   windows_build:
     runs-on: windows-latest
     needs: release
 
     steps:
-    - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.4
 
-    - uses: actions/setup-node@v2.1.4
-      with:
-        node-version: '12'
+      - uses: actions/setup-node@v2.1.4
+        with:
+          node-version: '12'
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - name: Setup MSBuild
-      id: setup_msbuild
-      uses: microsoft/setup-msbuild@v1.0.2
+      - name: Setup MSBuild
+        id: setup_msbuild
+        uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: echo msbuild path
-      run: |
-        echo "${{ steps.setup_msbuild.outputs.msbuildPath }}"
-        msbuild -version
+      - name: echo msbuild path
+        run: |
+          echo "${{ steps.setup_msbuild.outputs.msbuildPath }}"
+          msbuild -version
 
-    - name: build frida for Windows
-      run: |
-        git config --global user.name '${{ needs.release.outputs.user_name }}'
-        git config --global user.email '${{ needs.release.outputs.user_email }}'
-        Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted
-        git clone --recurse-submodules https://github.com/frida/frida
-        cd frida
-        pwsh .\releng\stage-python.ps1
-        .\releng\deps.py roll toolchain windows-x86 --activate
-        .\releng\deps.py roll sdk windows-any
-        New-Item build\tmp-windows -ItemType Directory -ea 0
-        python .\releng\generate-version-header.py build\tmp-windows\frida-version.h
-        msbuild frida.sln /p:Configuration=Release /p:Platform=x64
+      - name: build frida for Windows
+        run: |
+          git config --global user.name '${{ needs.release.outputs.user_name }}'
+          git config --global user.email '${{ needs.release.outputs.user_email }}'
+          Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted
+          git clone --recurse-submodules https://github.com/frida/frida
+          cd frida
+          pwsh .\releng\stage-python.ps1
+          .\releng\deps.py roll toolchain windows-x86 --activate
+          .\releng\deps.py roll sdk windows-any
+          New-Item build\tmp-windows -ItemType Directory -ea 0
+          python .\releng\generate-version-header.py build\tmp-windows\frida-version.h
+          msbuild frida.sln /p:Configuration=Release /p:Platform=x64
