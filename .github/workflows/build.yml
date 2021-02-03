@@ -162,7 +162,7 @@ jobs:
         shell: bash
         id: strong_frida_android
         run: |
-          tree -f frida/build
+          # tree -f frida/build
           xz frida/build/frida-android-arm/bin/frida-server
           xz frida/build/frida-android-arm64/bin/frida-server
           xz frida/build/frida-android-x86/bin/frida-server
@@ -188,7 +188,8 @@ jobs:
           cd frida/build/CFrida/android-x86_64-core && tar cJf ../android-x86_64-core.tar.xz . && cd '${{ github.workspace }}'
           cd frida/build/CFrida/android-x86_64-gum && tar cJf ../android-x86_64-gum.tar.xz . && cd '${{ github.workspace }}'
           cd frida/build/CFrida/android-x86_64-gumjs && tar cJf ../android-x86_64-gumjs.tar.xz . && cd '${{ github.workspace }}'
-          tree -f frida/build/CFrida
+
+          # tree -f frida/build/CFrida
 
           echo ::set-output name=frida_server_android_arm::'${{ github.workspace }}/frida/build/frida-android-arm/bin/frida-server.xz'
           echo ::set-output name=frida_server_android_arm64::'${{ github.workspace }}/frida/build/frida-android-arm64/bin/frida-server.xz'
@@ -507,7 +508,7 @@ jobs:
         shell: bash
         id: strong_frida_linux
         run: |
-          tree -f frida/build
+          # tree -f frida/build
           xz frida/build/frida-linux-x86/bin/frida-server
           xz frida/build/frida-linux-x86_64/bin/frida-server
           xz frida/build/frida-linux-x86/bin/frida-inject
@@ -521,7 +522,8 @@ jobs:
           cd frida/build/CFrida/linux-x86_64-core && tar cJf ../linux-x86_64-core.tar.xz . && cd '${{ github.workspace }}'
           cd frida/build/CFrida/linux-x86_64-gum && tar cJf ../linux-x86_64-gum.tar.xz . && cd '${{ github.workspace }}'
           cd frida/build/CFrida/linux-x86_64-gumjs && tar cJf ../linux-x86_64-gumjs.tar.xz . && cd '${{ github.workspace }}'
-          tree -f frida/build/CFrida
+
+          # tree -f frida/build/CFrida
 
           echo ::set-output name=frida_server_linux_x86::'${{ github.workspace }}/frida/build/frida-linux-x86/bin/frida-server.xz'
           echo ::set-output name=frida_server_linux_x86_64::'${{ github.workspace }}/frida/build/frida-linux-x86_64/bin/frida-server.xz'
@@ -690,38 +692,68 @@ jobs:
           export IOS_CERTID='-'
           make core-macos
           make core-ios
+          make core-macos-apple_silicon
+          make gadget-macos
           make gadget-ios
           make python-macos
           make tools-macos
           make node-macos
-          releng/devkit.py frida-core macos-x86_64 build/CFrida/macos-x86_64-core
-          releng/devkit.py frida-core ios-arm64 build/CFrida/ios-arm64-core
-          releng/devkit.py frida-core ios-arm64e build/CFrida/ios-arm64e-core
-          releng/devkit.py frida-gum macos-x86_64 build/CFrida/macos-x86_64-gum
-          releng/devkit.py frida-gum ios-arm64 build/CFrida/ios-arm64-gum
-          releng/devkit.py frida-gum ios-arm64e build/CFrida/ios-arm64e-gum
-          releng/devkit.py frida-gumjs macos-x86_64 build/CFrida/macos-x86_64-gumjs
-          releng/devkit.py frida-gumjs ios-arm64 build/CFrida/ios-arm64-gumjs
-          releng/devkit.py frida-gumjs ios-arm64e build/CFrida/ios-arm64e-gumjs
 
       - name: package build result for iOS and macOS
         shell: bash
         id: strong_frida_darwin
         run: |
-          tree -f frida/build
+          #tree -f frida/build
           xz frida/build/frida-macos-x86_64/bin/frida-server
           xz frida/build/frida-macos-x86_64/bin/frida-inject
           xz frida/build/frida-macos-x86_64/lib/frida-gadget.dylib
+          xz frida/build/frida-macos-arm64/bin/frida-server
+          xz frida/build/frida-macos-arm64/bin/frida-inject
+          xz frida/build/frida-macos-arm64/lib/frida-gadget.dylib
+          xz frida/build/frida-macos-arm64e/bin/frida-server
+          xz frida/build/frida-macos-arm64e/bin/frida-inject
+          xz frida/build/frida-macos-arm64e/lib/frida-gadget.dylib
+          xz frida/build/frida-macos-universal/lib/frida-gadget.dylib
           xz frida/build/frida-ios-arm64/bin/frida-inject
           xz frida/build/frida-ios-arm64/bin/frida-server
           xz frida/build/frida-ios-arm64/lib/frida-gadget.dylib
           xz frida/build/frida-ios-arm64e/bin/frida-inject
-          xz frida/build/frida-ios-arm64e/bin/frida-server
+          xz /frida/build/frida-ios-arm64e/bin/frida-server.xz'
           xz frida/build/frida-ios-arm64e/lib/frida-gadget.dylib
+          xz frida/build/frida-ios-universal/lib/frida-gadget.dylib
 
-          cd frida/build/CFrida/macos-x86_64-core && tar cJf ../macos-x86-core.tar.xz . && cd '${{ github.workspace }}'
-          cd frida/build/CFrida/macos-x86_64-gum && tar cJf ../macos-x86-gum.tar.xz . && cd '${{ github.workspace }}'
-          cd frida/build/CFrida/macos-x86_64-gumjs && tar cJf ../macos-x86-gumjs.tar.xz . && cd '${{ github.workspace }}'
+          releng/devkit.py frida-core macos-x86_64 build/CFrida/macos-x86_64-core
+          releng/devkit.py frida-core macos-arm64 build/CFrida/macos-arm64-core
+          releng/devkit.py frida-core macos-arm64e build/CFrida/macos-arm64e-core
+          releng/devkit.py frida-core ios-arm64 build/CFrida/ios-arm64-core
+          releng/devkit.py frida-core ios-arm64e build/CFrida/ios-arm64e-core
+          releng/devkit.py frida-gum macos-x86_64 build/CFrida/macos-x86_64-gum
+          releng/devkit.py frida-gum macos-arm64 build/CFrida/macos-arm64-gum
+          releng/devkit.py frida-gum macos-arm64e build/CFrida/macos-arm64e-gum
+          releng/devkit.py frida-gum ios-arm64 build/CFrida/ios-arm64-gum
+          releng/devkit.py frida-gum ios-arm64e build/CFrida/ios-arm64e-gum
+          releng/devkit.py frida-gumjs macos-x86_64 build/CFrida/macos-x86_64-gumjs
+          releng/devkit.py frida-gumjs macos-arm64 build/CFrida/macos-arm64-gumjs
+          releng/devkit.py frida-gumjs macos-arm64e build/CFrida/macos-arm64e-gumjs
+          releng/devkit.py frida-gumjs ios-arm64 build/CFrida/ios-arm64-gumjs
+          releng/devkit.py frida-gumjs ios-arm64e build/CFrida/ios-arm64e-gumjs
+          releng/devkit.py frida-core macos-x86_64 frida-swift/CFrida/
+          # cd frida-swift && xcodebuild -project Frida.xcodeproj -target Frida -destination 'platform=macOS,arch=x86_64'
+
+          FRIDA_TOOLCHAIN='${{ github.workspace }}/frida/build/toolchain-macos-x86_64' frida-core/tools/package-server.sh build/frida-ios-arm64/bin/frida-server build/frida_iphoneos-arm.deb
+          FRIDA_TOOLCHAIN='${{ github.workspace }}/frida/build/toolchain-macos-x86_64' frida-core/tools/package-server.sh build/frida-ios-arm64e/bin/frida-server build/frida64_iphoneos-arm.deb
+
+          cd frida/build/CFrida/macos-x86_64-core && tar cJf ../macos-x86_64-core.tar.xz . && cd '${{ github.workspace }}'
+          cd frida/build/CFrida/macos-x86_64-gum && tar cJf ../macos-x86_64-gum.tar.xz . && cd '${{ github.workspace }}'
+          cd frida/build/CFrida/macos-x86_64-gumjs && tar cJf ../macos-x86_64-gumjs.tar.xz . && cd '${{ github.workspace }}'
+
+          cd frida/build/CFrida/macos-arm64-core && tar cJf ../macos-arm64-core.tar.xz . && cd '${{ github.workspace }}'
+          cd frida/build/CFrida/macos-arm64-gum && tar cJf ../macos-arm64-gum.tar.xz . && cd '${{ github.workspace }}'
+          cd frida/build/CFrida/macos-arm64-gumjs && tar cJf ../macos-arm64-gumjs.tar.xz . && cd '${{ github.workspace }}'
+
+          cd frida/build/CFrida/macos-arm64e-core && tar cJf ../macos-arm64e-core.tar.xz . && cd '${{ github.workspace }}'
+          cd frida/build/CFrida/macos-arm64e-gum && tar cJf ../macos-arm64e-gum.tar.xz . && cd '${{ github.workspace }}'
+          cd frida/build/CFrida/macos-arm64e-gumjs && tar cJf ../macos-arm64e-gumjs.tar.xz . && cd '${{ github.workspace }}'
 
           cd frida/build/CFrida/ios-arm64-core && tar cJf ../ios-arm64-core.tar.xz . && cd '${{ github.workspace }}'
           cd frida/build/CFrida/ios-arm64-gum && tar cJf ../ios-arm64-gum.tar.xz . && cd '${{ github.workspace }}'
@@ -732,16 +764,49 @@ jobs:
           cd frida/build/CFrida/ios-arm64e-gumjs && tar cJf ../ios-arm64e-gumjs.tar.xz . && cd '${{ github.workspace }}'
 
           echo ::set-output name=frida_server_macos_x86_64::'${{ github.workspace }}/frida/build/frida-macos-x86_64/bin/frida-server.xz'
-          echo ::set-output name=frida_server_ios_arm64::'${{ github.workspace }}/frida/build/frida-ios-arm64/bin/frida-server.xz'
-          echo ::set-output name=frida_server_ios_arm64e::'${{ github.workspace }}/frida/build/frida-ios-arm64e/bin/frida-server.xz'
-
           echo ::set-output name=frida_inject_macos_x86_64::'${{ github.workspace }}/frida/build/frida-macos-x86_64/bin/frida-inject.xz'
-          echo ::set-output name=frida_inject_ios_arm64::'${{ github.workspace }}/frida/build/frida-ios-arm64/bin/frida-inject.xz'
-          echo ::set-output name=frida_inject_ios_arm64e::'${{ github.workspace }}/frida/build/frida-ios-arm64e/bin/frida-inject.xz'
-
           echo ::set-output name=frida_gadget_macos_x86_64::'${{ github.workspace }}/frida/build/frida-macos-x86_64/lib/frida-gadget.dylib.xz'
+
+          echo ::set-output name=frida_server_macos_arm64::'${{ github.workspace }}/frida/build/frida-macos-arm64/bin/frida-server.xz'
+          echo ::set-output name=frida_inject_macos_arm64::'${{ github.workspace }}/frida/build/frida-macos-arm64/bin/frida-inject.xz'
+          echo ::set-output name=frida_gadget_macos_arm64::'${{ github.workspace }}/frida/build/frida-macos-arm64/lib/frida-gadget.dylib.xz'
+
+          echo ::set-output name=frida_server_macos_arm64e::'${{ github.workspace }}/frida/build/frida-macos-arm64e/bin/frida-server.xz'
+          echo ::set-output name=frida_inject_macos_arm64e::'${{ github.workspace }}/frida/build/frida-macos-arm64e/bin/frida-inject.xz'
+          echo ::set-output name=frida_gadget_macos_arm64e::'${{ github.workspace }}/frida/build/frida-macos-arm64e/lib/frida-gadget.dylib.xz'
+
+          echo ::set-output name=frida_server_ios_arm64::'${{ github.workspace }}/frida/build/frida-ios-arm64/bin/frida-server.xz'
+          echo ::set-output name=frida_inject_ios_arm64::'${{ github.workspace }}/frida/build/frida-ios-arm64/bin/frida-inject.xz'
           echo ::set-output name=frida_gadget_ios_arm64::'${{ github.workspace }}/frida/build/frida-ios-arm64/lib/frida-gadget.dylib.xz'
+
+          echo ::set-output name=frida_server_ios_arm64e::'${{ github.workspace }}/frida/build/frida-ios-arm64e/bin/frida-server.xz'
+          echo ::set-output name=frida_inject_ios_arm64e::'${{ github.workspace }}/frida/build/frida-ios-arm64e/bin/frida-inject.xz'
           echo ::set-output name=frida_gadget_ios_arm64e::'${{ github.workspace }}/frida/build/frida-ios-arm64e/lib/frida-gadget.dylib.xz'
+
+          echo ::set-output name=frida_gadget_macos_universal::'${{ github.workspace }}/frida/build/frida-macos-universal/lib/frida-gadget.dylib.xz'
+
+          echo ::set-output name=frida_core_macos_x86_64::'${{ github.workspace }}/frida/build/CFrida/macos-x86_64-core.tar.xz'
+          echo ::set-output name=frida_gum_macos_x86_64::'${{ github.workspace }}/frida/build/CFrida/macos-x86_64-gum.tar.xz'
+          echo ::set-output name=frida_gumjs_macos_x86_64::'${{ github.workspace }}/frida/build/CFrida/macos-x86_64-gumjs.tar.xz'
+
+          echo ::set-output name=frida_core_macos_arm64::'${{ github.workspace }}/frida/build/CFrida/macos-arm64-core.tar.xz'
+          echo ::set-output name=frida_gum_macos_arm64::'${{ github.workspace }}/frida/build/CFrida/macos-arm64-gum.tar.xz'
+          echo ::set-output name=frida_gumjs_macos_arm64::'${{ github.workspace }}/frida/build/CFrida/macos-arm64-gumjs.tar.xz'
+
+          echo ::set-output name=frida_core_macos_arm64e::'${{ github.workspace }}/frida/build/CFrida/macos-arm64e-core.tar.xz'
+          echo ::set-output name=frida_gum_macos_arm64e::'${{ github.workspace }}/frida/build/CFrida/macos-arm64e-gum.tar.xz'
+          echo ::set-output name=frida_gumjs_macos_arm64e::'${{ github.workspace }}/frida/build/CFrida/macos-arm64e-gumjs.tar.xz'
+
+          echo ::set-output name=frida_core_ios_arm64::'${{ github.workspace }}/frida/build/CFrida/ios-arm64-core.tar.xz'
+          echo ::set-output name=frida_gum_ios_arm64::'${{ github.workspace }}/frida/build/CFrida/ios-arm64-gum.tar.xz'
+          echo ::set-output name=frida_gumjs_ios_arm64::'${{ github.workspace }}/frida/build/CFrida/ios-arm64-gumjs.tar.xz'
+
+          echo ::set-output name=frida_core_ios_arm64e::'${{ github.workspace }}/frida/build/CFrida/ios-arm64e-core.tar.xz'
+          echo ::set-output name=frida_gum_ios_arm64e::'${{ github.workspace }}/frida/build/CFrida/ios-arm64e-gum.tar.xz'
+          echo ::set-output name=frida_gumjs_ios_arm64e::'${{ github.workspace }}/frida/build/CFrida/ios-arm64e-gumjs.tar.xz'
+
+          echo ::set-output name=frida_server_ios_deb_arm64::'${{ github.workspace }}/frida/build/frida_iphoneos-arm.deb'
+          echo ::set-output name=frida_server_ios_deb_arm64e::'${{ github.workspace }}/frida/build/frida64_iphoneos-arm.deb'
 
       - name: Upload macOS x86_64 frida-server for strong-frida
         uses: actions/upload-release-asset@v1.0.2
@@ -770,17 +835,77 @@ jobs:
         with:
           upload_url: '${{ needs.release.outputs.upload_url }}'
           asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gadget_macos_x86_64 }}'
-          asset_name: 'frida-gadget-${{ needs.release.outputs.frida_version }}-macos_x86_64.dylib.xz'
+          asset_name: 'frida-gadget-${{ needs.release.outputs.frida_version }}-macos-x86_64.dylib.xz'
           asset_content_type: application/octet-stream
 
-      - name: Upload iOS arm64 frida-server for strong-frida
+      - name: Upload macOS arm64 frida-server for strong-frida
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: '${{ needs.release.outputs.upload_url }}'
-          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_server_ios_arm64 }}'
-          asset_name: 'frida-server-${{ needs.release.outputs.frida_version }}-ios-arm64.xz'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_server_macos_arm64 }}'
+          asset_name: 'frida-server-${{ needs.release.outputs.frida_version }}-macos-arm64.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64 frida-inject for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_inject_macos_arm64 }}'
+          asset_name: 'frida-inject-${{ needs.release.outputs.frida_version }}-macos-arm64.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64 frida-gadget for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gadget_macos_arm64 }}'
+          asset_name: 'frida-gadget-${{ needs.release.outputs.frida_version }}-macos-arm64.dylib.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64e frida-server for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_server_macos_arm64e }}'
+          asset_name: 'frida-server-${{ needs.release.outputs.frida_version }}-macos-arm64e.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64e frida-inject for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_inject_macos_arm64e }}'
+          asset_name: 'frida-inject-${{ needs.release.outputs.frida_version }}-macos-arm64e.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64e frida-gadget for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gadget_macos_arm64e }}'
+          asset_name: 'frida-gadget-${{ needs.release.outputs.frida_version }}-macos-arm64e.dylib.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64e frida-server for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_server_ios_arm64e }}'
+          asset_name: 'frida-server-${{ needs.release.outputs.frida_version }}-ios-arm64e.xz'
           asset_content_type: application/octet-stream
 
       - name: Upload iOS arm64 frida-inject for strong-frida
@@ -832,3 +957,174 @@ jobs:
           asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gadget_ios_arm64e }}'
           asset_name: 'frida-gadget-${{ needs.release.outputs.frida_version }}-ios-arm64e.dylib.xz'
           asset_content_type: application/octet-stream
+
+      - name: Upload macOS x86_64 frida-core-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_core_macos_x86_64 }}'
+          asset_name: 'frida-core-devkit-${{ needs.release.outputs.frida_version }}-macos-x86_64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS x86_64 frida-gum-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gum_macos_x86_64 }}'
+          asset_name: 'frida-gum-devkit-${{ needs.release.outputs.frida_version }}-macos-x86_64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS x86_64 frida-gumjs-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gumjs_macos_x86_64 }}'
+          asset_name: 'frida-gumjs-devkit-${{ needs.release.outputs.frida_version }}-macos-x86_64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64 frida-core-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_core_macos_arm64 }}'
+          asset_name: 'frida-core-devkit-${{ needs.release.outputs.frida_version }}-macos-arm64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64 frida-gum-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gum_macos_arm64 }}'
+          asset_name: 'frida-gum-devkit-${{ needs.release.outputs.frida_version }}-macos-arm64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64 frida-gumjs-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gumjs_macos_arm64 }}'
+          asset_name: 'frida-gumjs-devkit-${{ needs.release.outputs.frida_version }}-macos-arm64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64e frida-core-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_core_macos_arm64e }}'
+          asset_name: 'frida-core-devkit-${{ needs.release.outputs.frida_version }}-macos-arm64e.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64e frida-gum-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gum_macos_arm64e }}'
+          asset_name: 'frida-gum-devkit-${{ needs.release.outputs.frida_version }}-macos-arm64e.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS arm64e frida-gumjs-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gumjs_macos_arm64e }}'
+          asset_name: 'frida-gumjs-devkit-${{ needs.release.outputs.frida_version }}-macos-arm64e.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64 frida-core-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_core_ios_arm64 }}'
+          asset_name: 'frida-core-devkit-${{ needs.release.outputs.frida_version }}-ios-arm64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64 frida-gum-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gum_ios_arm64 }}'
+          asset_name: 'frida-gum-devkit-${{ needs.release.outputs.frida_version }}-ios-arm64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64 frida-gumjs-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gumjs_ios_arm64 }}'
+          asset_name: 'frida-gumjs-devkit-${{ needs.release.outputs.frida_version }}-ios-arm64.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64e frida-core-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_core_ios_arm64e }}'
+          asset_name: 'frida-core-devkit-${{ needs.release.outputs.frida_version }}-ios-arm64e.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64e frida-gum-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gum_ios_arm64e }}'
+          asset_name: 'frida-gum-devkit-${{ needs.release.outputs.frida_version }}-ios-arm64e.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64e frida-gumjs-devkit for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_gumjs_ios_arm64e }}'
+          asset_name: 'frida-gumjs-devkit-${{ needs.release.outputs.frida_version }}-ios-arm64e.tar.xz'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64 frida-server deb for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_server_ios_deb_arm64 }}'
+          asset_name: 'frida_${{ needs.release.outputs.frida_version }}_iphoneos-arm.deb'
+          asset_content_type: application/octet-stream
+
+      - name: Upload iOS arm64e frida-server deb for strong-frida
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: '${{ needs.release.outputs.upload_url }}'
+          asset_path: '${{ steps.strong_frida_darwin.outputs.frida_server_ios_deb_arm64e }}'
+          asset_name: 'frida64_${{ needs.release.outputs.frida_version }}_iphoneos-arm.deb'
+          asset_content_type: application/octet-stream
+

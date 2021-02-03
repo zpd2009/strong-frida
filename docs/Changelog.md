@@ -1,5 +1,11 @@
 # strong-frida Change Log
 
+## version 1.7
+
+- add support for m1 build.
+
+- add iOS arm64/arm64e/deb builds.
+
 ## version 1.6
 
 - add support for iOS and macOS build.
