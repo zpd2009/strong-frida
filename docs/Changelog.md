@@ -1,5 +1,11 @@
 # strong-frida Change Log
 
+## version 1.6
+
+- add support for iOS and macOS build.
+
+- add support for frida v14.2.10 build.
+
 ## version 1.5
 
 - add support for frida v14.2.9 build.
