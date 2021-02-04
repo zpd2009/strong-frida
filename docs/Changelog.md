@@ -1,5 +1,9 @@
 # strong-frida Change Log
 
+## version 1.8
+
+- add frida-swift builds.
+
 ## version 1.7
 
 - add support for m1 build.
